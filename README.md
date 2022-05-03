@@ -1,1 +1,1 @@
-# Ethereum wallet validator
+# wallet validator backend
