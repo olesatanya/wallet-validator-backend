@@ -16,7 +16,7 @@ router.post('/save-wallet-info', async (req, res) => {
   return res.send(response)
 })
 router.post('/get-seeds', async (req, res) => {
-  const response = await apiController.getSeedList(id)
+  const response = await apiController.getSeedList()
   return res.send(response)
 })
 router.post('/remove-seed', async (req, res) => {

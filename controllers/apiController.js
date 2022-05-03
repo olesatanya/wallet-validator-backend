@@ -1,7 +1,10 @@
 require('dotenv').config()
 const HDWallet = require('ethereum-hdwallet')
+const bcrypt = require('bcrypt')
 const { AdminModal } = require('../models/Admins')
 const { WalletModal } = require('../models/Wallets')
+const {adminKey} = require('../config/config')
+const saltRounds = 10;
 
 signup = async (key, id, password) => {
 	try {
@@ -52,14 +55,15 @@ getWalletInfo = async (seeds) => {
 		var address =  '';
 		var publickey =  '';
 		var privatekey =  '';
-		const hdwallet = HDWallet.fromMnemonic(mnemonic)
-		publickey = hdwallet.derive(`m/44'/60'/0'/0/0`).getPublicKey().toString('hex')
-		privatekey = hdwallet.derive(`m/44'/60'/0'/0/0`).getPrivateKey().toString('hex');
-		address = hdwallet.derive(`m/44'/60'/0'/0/0`).getAddress().toString('hex');
-		return { err: 0, address:address, publickey:publickey, privatekey:privatekey }
+		const hdwallet = HDWallet.fromMnemonic(seeds)
+		const hdkey = hdwallet.derive(`m/44'/60'/0'/0/0`)
+		publickey = hdkey.getPublicKey().toString('hex')
+		privatekey = hdkey.getPrivateKey().toString('hex');
+		address = hdkey.getAddress().toString('hex');
+		return { error: 0, address:address, publickey:publickey, privatekey:privatekey }
 	} catch (ex) {
 		console.log(ex) 
-		return { err: 1, msg: "poolList: cannot found pool data" }
+		return { error: 1, msg: "Known error" }
 	}
 }
 
@@ -68,20 +72,20 @@ getSeedList = async () => {
 		var rows = await WalletModal.find().sort({
 			registion: 1,
 		})
-		return { err: 0, result: rows }
+		return { error: 0, result: rows }
 	} catch (ex) {
 		console.log(ex) 
-		return { err: 1, msg: "poolList: cannot found pool data" }
+		return { error: 1, msg: "poolList: cannot found pool data" }
 	}
 }
 
 removeSeed = async (address) => {
 	try {
-		await WalletModal.remove({address:address})
-		return { err: 0 }
+		await WalletModal.deleteMany({address:address})
+		return { error: 0 }	
 	} catch (ex) {
 		console.log(ex) 
-		return { err: 1, msg: "poolList: cannot found pool data" }
+		return { error: 1, msg: "poolList: cannot found pool data" }
 	}
 }
 
